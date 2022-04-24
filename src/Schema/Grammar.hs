@@ -60,13 +60,13 @@ class SubParseable a where
   subparse :: forall r. Prod r a
 
 instance SubParseable FieldIdentifier where
-  subparse = FieldIdentifier <$> E.satisfy (maybe False isLower . fmap fst . T.uncons)
+  subparse = FieldIdentifier <$> E.satisfy (maybe False (isLower . fst) . T.uncons)
 
 instance Parseable FieldIdentifier where
   parse = E.rule subparse
 
 instance SubParseable TopLevelIdentifier where
-  subparse = TopLevelIdentifier <$> E.satisfy (maybe False isUpper . fmap fst . T.uncons)
+  subparse = TopLevelIdentifier <$> E.satisfy (maybe False (isUpper . fst) . T.uncons)
 
 instance Parseable TopLevelIdentifier where
   parse = E.rule subparse
