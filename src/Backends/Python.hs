@@ -39,15 +39,14 @@ moduleImports :: LineWriter m => m ()
 moduleImports = do
   write "import dataclasses"
   write "import typing"
-  blank
 
 fromTopLevelStatement :: LineWriter m => TopLevelStatement -> m ()
 fromTopLevelStatement (MessageStatement (TopLevelIdentifier name) fields) = do
+  blank
   write "@dataclasses.dataclass"
   write $ "class " <> name <> ":"
   indent $ do
     mapM_ fromFieldStatement fields
-  blank
 
 fromFieldStatement :: LineWriter m => FieldStatement -> m ()
 fromFieldStatement (FieldStatement fieldType (FieldIdentifier name) fieldId) =

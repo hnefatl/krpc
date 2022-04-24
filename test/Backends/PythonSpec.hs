@@ -25,7 +25,7 @@ shouldTranspileTo' x y = shouldTranspileTo (T.unlines x) (T.unlines y)
 
 spec :: Spec
 spec = describe "Python Backend" $ do
-  it "person" $
+  it "person demo" $
     shouldTranspileTo'
       [ "message Person {",
         "  optional<string> name = 1;",
@@ -40,6 +40,5 @@ spec = describe "Python Backend" $ do
         "class Person:",
         "  name: typing.Optional[str]",
         "  age: typing.Optional[int]",
-        "  bits: typing.List[bool]",
-        ""
+        "  bits: typing.List[bool]"
       ]
