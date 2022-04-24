@@ -28,8 +28,8 @@ spec = describe "Python Backend" $ do
   it "person" $
     shouldTranspileTo'
       [ "message Person {",
-        "  string name = 1;",
-        "  int32 age = 2;",
+        "  optional<string> name = 1;",
+        "  optional<int32> age = 2;",
         "  list<bool> bits = 3;",
         "}"
       ]

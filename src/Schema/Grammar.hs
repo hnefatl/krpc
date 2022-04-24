@@ -38,6 +38,7 @@ data TypeExpr
   = StringType
   | Int32Type
   | BoolType
+  | OptionalType TypeExpr
   | ListType TypeExpr
   deriving (Eq, Show)
 
@@ -92,7 +93,8 @@ instance Parseable TypeExpr where
     x1 <- E.rule $ StringType <$ E.namedToken "string" <|> x2
     x2 <- E.rule $ Int32Type <$ E.namedToken "int32" <|> x3
     x3 <- E.rule $ BoolType <$ E.namedToken "bool" <|> x4
-    x4 <- E.rule $ ListType <$ E.namedToken "list" <* E.namedToken "<" <*> x1 <* E.namedToken ">"
+    x4 <- E.rule $ OptionalType <$ E.namedToken "optional" <* E.namedToken "<" <*> x1 <* E.namedToken ">" <|> x5
+    x5 <- E.rule $ ListType <$ E.namedToken "list" <* E.namedToken "<" <*> x1 <* E.namedToken ">"
     return x1
 
 instance Parseable FieldStatement where

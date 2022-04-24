@@ -27,17 +27,11 @@ fromTopLevelStatement (MessageStatement (TopLevelIdentifier name) fields) =
 
 fromFieldStatement :: FieldStatement -> T.Text
 fromFieldStatement (FieldStatement fieldType (FieldIdentifier name) fieldId) =
-  T.concat ["  ", name, ": ", fromFieldTypeOptional fieldType]
+  T.concat ["  ", name, ": ", fromFieldType fieldType]
 
 fromFieldType :: TypeExpr -> T.Text
 fromFieldType StringType = "str"
 fromFieldType Int32Type = "int"
 fromFieldType BoolType = "bool"
+fromFieldType (OptionalType t) = T.concat ["typing.Optional[", fromFieldType t, "]"]
 fromFieldType (ListType t) = T.concat ["typing.List[", fromFieldType t, "]"]
-
-fromFieldTypeOptional :: TypeExpr -> T.Text
-fromFieldTypeOptional t@ListType {} = fromFieldType t
-fromFieldTypeOptional t = optional (fromFieldType t)
-
-optional :: T.Text -> T.Text
-optional t = T.concat ["typing.Optional[", t, "]"]

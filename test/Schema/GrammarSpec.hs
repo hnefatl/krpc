@@ -50,7 +50,9 @@ spec = describe "Grammar" $ do
       [ ("string", Just StringType),
         ("int32", Just Int32Type),
         ("bool", Just BoolType),
+        ("optional<int32>", Just $ OptionalType Int32Type),
         ("list<int32>", Just $ ListType Int32Type),
+        ("optional<list<int32>>", Just $ OptionalType $ ListType Int32Type),
         ("list< list<bool> >", Just $ ListType $ ListType BoolType)
       ]
   describe "FieldStatement" $
