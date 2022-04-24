@@ -88,7 +88,7 @@ instance Parseable TypeExpr where
     x1 <- E.rule $ StringType <$ E.namedToken "string" <|> x2
     x2 <- E.rule $ Int32Type <$ E.namedToken "int32" <|> x3
     x3 <- E.rule $ BoolType <$ E.namedToken "bool" <|> x4
-    x4 <- E.rule $ ListType <$ E.namedToken "list<" <*> x1 <* E.namedToken ">"
+    x4 <- E.rule $ ListType <$ E.namedToken "list" <* E.namedToken "<" <*> x1 <* E.namedToken ">"
     return x1
 
 instance Parseable FieldStatement where
@@ -107,8 +107,11 @@ instance Parseable TopLevelStatement where
 
 type Report = E.Report String [String]
 
+tokenise :: String -> [String]
+tokenise = words
+
 parseGrammar :: (Parseable a, MonadError Report m) => String -> m a
-parseGrammar text = case E.fullParses (E.parser parse) [text] of
+parseGrammar text = case E.fullParses (E.parser parse) (tokenise text) of
   ([parsed], _) -> return parsed
   (_, report) -> throwError report
 
