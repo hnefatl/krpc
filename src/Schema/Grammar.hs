@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecursiveDo #-}
 
@@ -10,10 +11,11 @@ module Schema.Grammar where
 import Control.Applicative (Alternative (some, (<|>)))
 import Control.Monad.Except (MonadError, throwError)
 import Data.Char (isLower, isUpper)
-import Data.Maybe (listToMaybe)
+import qualified Data.Text as T
+import Data.Text.Read
 import Data.Word (Word32)
 import qualified Text.Earley as E
-import Text.Read (readMaybe)
+import TextShow
 
 -- Example syntax:
 --
@@ -23,10 +25,10 @@ import Text.Read (readMaybe)
 --   list<bool> bits = 3;
 -- }
 
-newtype FieldIdentifier = FieldIdentifier String
+newtype FieldIdentifier = FieldIdentifier T.Text
   deriving (Eq, Show)
 
-newtype TopLevelIdentifier = TopLevelIdentifier String
+newtype TopLevelIdentifier = TopLevelIdentifier T.Text
   deriving (Eq, Show)
 
 newtype FieldNum = FieldNum Word32
@@ -47,7 +49,7 @@ data TopLevelStatement
   = MessageStatement TopLevelIdentifier [FieldStatement]
   deriving (Eq, Show)
 
-type Prod r a = E.Prod r String String a
+type Prod r a = E.Prod r T.Text T.Text a
 
 type Grammar r a = E.Grammar r (Prod r a)
 
@@ -58,13 +60,13 @@ class SubParseable a where
   subparse :: forall r. Prod r a
 
 instance SubParseable FieldIdentifier where
-  subparse = FieldIdentifier <$> E.satisfy (maybe False isLower . listToMaybe)
+  subparse = FieldIdentifier <$> E.satisfy (maybe False isLower . fmap fst . T.uncons)
 
 instance Parseable FieldIdentifier where
   parse = E.rule subparse
 
 instance SubParseable TopLevelIdentifier where
-  subparse = TopLevelIdentifier <$> E.satisfy (maybe False isUpper . listToMaybe)
+  subparse = TopLevelIdentifier <$> E.satisfy (maybe False isUpper . fmap fst . T.uncons)
 
 instance Parseable TopLevelIdentifier where
   parse = E.rule subparse
@@ -72,9 +74,9 @@ instance Parseable TopLevelIdentifier where
 instance SubParseable FieldNum where
   subparse = FieldNum <$> E.terminal readWord32
     where
-      readWord32 s =
-        readMaybe s >>= \x ->
-          if x < 0 || x > 4294967295 then Nothing else Just (fromInteger x)
+      readWord32 s = case decimal s of
+        Left _ -> Nothing
+        Right (x, _) -> if x < 0 || x > 4294967295 then Nothing else Just (fromInteger x)
 
 instance Parseable FieldNum where
   parse = E.rule subparse
@@ -95,7 +97,7 @@ instance Parseable FieldStatement where
   parse = mdo
     typeExpr <- parse
     identifier <- parse
-    _ <- E.rule $ E.namedToken "="
+    _ <- E.rule $ E.namedToken ("=" :: T.Text)
     fieldNum <- parse
     E.rule $ FieldStatement <$> typeExpr <*> identifier <*> fieldNum
 
@@ -105,20 +107,20 @@ instance Parseable TopLevelStatement where
     fieldStatement <- parse
     E.rule $ MessageStatement <$> identifier <*> some fieldStatement
 
-type Report = E.Report String [String]
+type Report = E.Report T.Text [T.Text]
 
-tokenise :: String -> [String]
-tokenise = words
+tokenise :: T.Text -> [T.Text]
+tokenise = T.words
 
-parseGrammar :: (Parseable a, MonadError Report m) => String -> m a
+parseGrammar :: (Parseable a, MonadError Report m) => T.Text -> m a
 parseGrammar text = case E.fullParses (E.parser parse) (tokenise text) of
   ([parsed], _) -> return parsed
   (_, report) -> throwError report
 
-showReport :: Report -> String
+showReport :: Report -> T.Text
 showReport (E.Report position expected unconsumed) =
-  unlines
-    [ "error at position " ++ show position,
-      "remaining text: " ++ show unconsumed,
-      "expected one of: " ++ show expected
+  T.unlines
+    [ "error at position " `T.append` showt position,
+      "remaining text: " `T.append` showt unconsumed,
+      "expected one of: " `T.append` showt expected
     ]

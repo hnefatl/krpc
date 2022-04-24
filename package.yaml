@@ -25,6 +25,8 @@ dependencies:
 - base >= 4.7 && < 5
 - Earley == 0.13.0.1
 - mtl == 2.2.2
+- text == 1.2.5.0
+- text-show == 3.9.6
 
 library:
   source-dirs: src

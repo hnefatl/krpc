@@ -35,6 +35,8 @@ library
       Earley ==0.13.0.1
     , base >=4.7 && <5
     , mtl ==2.2.2
+    , text ==1.2.5.0
+    , text-show ==3.9.6
   default-language: Haskell2010
 
 test-suite krpc-test
@@ -52,4 +54,6 @@ test-suite krpc-test
     , hspec
     , krpc
     , mtl ==2.2.2
+    , text ==1.2.5.0
+    , text-show ==3.9.6
   default-language: Haskell2010
