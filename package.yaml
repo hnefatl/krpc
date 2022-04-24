@@ -27,6 +27,7 @@ dependencies:
 - mtl == 2.2.2
 - text == 1.2.5.0
 - text-show == 3.9.6
+- language-python == 0.5.8
 
 library:
   source-dirs: src

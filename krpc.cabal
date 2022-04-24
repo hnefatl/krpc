@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Backends.Python
       Schema.Grammar
       Schema.Tokeniser
   other-modules:
@@ -35,6 +36,7 @@ library
   build-depends:
       Earley ==0.13.0.1
     , base >=4.7 && <5
+    , language-python ==0.5.8
     , mtl ==2.2.2
     , text ==1.2.5.0
     , text-show ==3.9.6
@@ -44,6 +46,7 @@ test-suite krpc-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Backends.PythonSpec
       Schema.GrammarSpec
       Schema.TokeniserSpec
       Paths_krpc
@@ -55,6 +58,7 @@ test-suite krpc-test
     , base >=4.7 && <5
     , hspec
     , krpc
+    , language-python ==0.5.8
     , mtl ==2.2.2
     , text ==1.2.5.0
     , text-show ==3.9.6

@@ -8,7 +8,7 @@
 
 module Schema.Grammar where
 
-import Control.Applicative (Alternative (some, (<|>)))
+import Control.Applicative (Alternative (many, some, (<|>)))
 import Control.Monad.Except (MonadError, throwError)
 import Data.Char (isLower, isUpper)
 import qualified Data.Text as T
@@ -48,6 +48,8 @@ data FieldStatement
 data TopLevelStatement
   = MessageStatement TopLevelIdentifier [FieldStatement]
   deriving (Eq, Show)
+
+newtype Schema = Schema [TopLevelStatement]
 
 type Prod r a = E.Prod r T.Text T.Text a
 
@@ -102,6 +104,11 @@ instance Parseable TopLevelStatement where
   parse = mdo
     fieldStatement <- parse
     E.rule $ MessageStatement <$ E.namedToken "message" <*> subparse <* E.namedToken "{" <*> some fieldStatement <* E.namedToken "}"
+
+instance Parseable Schema where
+  parse = mdo
+    topLevelStatement <- parse
+    E.rule $ Schema <$> many topLevelStatement
 
 type Report = E.Report T.Text [T.Text]
 
