@@ -18,7 +18,7 @@ shouldParseTo input expected =
 
 shouldAllParse :: (Parseable a, Eq a, Show a) => [(T.Text, Maybe a)] -> SpecWith ()
 shouldAllParse cases = for_ cases $ \(p, expected) ->
-  it (unwords [T.unpack p, " should parse to ", show expected]) $
+  it (unwords [T.unpack p, "should parse to", show expected]) $
     case (runExcept $ parseGrammar $ tokenise p, expected) of
       (Left _, Nothing) -> return ()
       (Right _, Nothing) -> expectationFailure "expected failure but parsed"
@@ -51,5 +51,28 @@ spec = describe "Grammar" $ do
         ("int32", Just Int32Type),
         ("bool", Just BoolType),
         ("list<int32>", Just $ ListType Int32Type),
-        ("list<list<bool>>", Just $ ListType $ ListType BoolType)
+        ("list< list<bool> >", Just $ ListType $ ListType BoolType)
+      ]
+  describe "FieldStatement" $
+    shouldAllParse
+      [ ("string name = 1;", Just $ FieldStatement StringType (FieldIdentifier "name") (FieldNum 1)),
+        ("int32 age = 2;", Just $ FieldStatement Int32Type (FieldIdentifier "age") (FieldNum 2)),
+        ("list<bool> bits = 3;", Just $ FieldStatement (ListType BoolType) (FieldIdentifier "bits") (FieldNum 3))
+      ]
+  describe "TopLevelStatement" $
+    shouldAllParse
+      [ ("message Person { string name = 1; }", Just $ MessageStatement (TopLevelIdentifier "Person") [FieldStatement StringType (FieldIdentifier "name") (FieldNum 1)]),
+        ( T.unlines
+            [ "message Person {",
+              "  string name = 1;",
+              "  int32 age = 2;",
+              "}"
+            ],
+          Just $
+            MessageStatement
+              (TopLevelIdentifier "Person")
+              [ FieldStatement StringType (FieldIdentifier "name") (FieldNum 1),
+                FieldStatement Int32Type (FieldIdentifier "age") (FieldNum 2)
+              ]
+        )
       ]

@@ -60,19 +60,19 @@ class SubParseable a where
   subparse :: forall r. Prod r a
 
 instance SubParseable FieldIdentifier where
-  subparse = FieldIdentifier <$> E.satisfy (maybe False (isLower . fst) . T.uncons)
+  subparse = FieldIdentifier <$> E.satisfy (maybe False (isLower . fst) . T.uncons) E.<?> "FieldIdentifier"
 
 instance Parseable FieldIdentifier where
   parse = E.rule subparse
 
 instance SubParseable TopLevelIdentifier where
-  subparse = TopLevelIdentifier <$> E.satisfy (maybe False (isUpper . fst) . T.uncons)
+  subparse = TopLevelIdentifier <$> E.satisfy (maybe False (isUpper . fst) . T.uncons) E.<?> "TopLevelIdentifier"
 
 instance Parseable TopLevelIdentifier where
   parse = E.rule subparse
 
 instance SubParseable FieldNum where
-  subparse = FieldNum <$> E.terminal readWord32
+  subparse = FieldNum <$> E.terminal readWord32 E.<?> "FieldNum"
     where
       readWord32 s = case decimal s of
         Left _ -> Nothing
@@ -96,16 +96,12 @@ instance Parseable TypeExpr where
 instance Parseable FieldStatement where
   parse = mdo
     typeExpr <- parse
-    identifier <- parse
-    _ <- E.rule $ E.namedToken ("=" :: T.Text)
-    fieldNum <- parse
-    E.rule $ FieldStatement <$> typeExpr <*> identifier <*> fieldNum
+    E.rule $ FieldStatement <$> typeExpr <*> subparse <* E.namedToken "=" <*> subparse <* E.namedToken ";"
 
 instance Parseable TopLevelStatement where
   parse = mdo
-    identifier <- parse
     fieldStatement <- parse
-    E.rule $ MessageStatement <$> identifier <*> some fieldStatement
+    E.rule $ MessageStatement <$ E.namedToken "message" <*> subparse <* E.namedToken "{" <*> some fieldStatement <* E.namedToken "}"
 
 type Report = E.Report T.Text [T.Text]
 
