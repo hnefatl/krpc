@@ -18,7 +18,7 @@ instance Show PText where
 shouldTranspileTo :: T.Text -> T.Text -> IO ()
 shouldTranspileTo input expected = case runExcept (parseGrammar $ tokenise input) of
   Left report -> expectationFailure $ T.unpack $ showReport report
-  Right schema -> PText (fromSchemaWithoutHeader schema) `shouldBe` PText expected
+  Right schema -> PText (runLineWriter $ fromSchemaWithoutHeader schema) `shouldBe` PText expected
 
 shouldTranspileTo' :: [T.Text] -> [T.Text] -> IO ()
 shouldTranspileTo' x y = shouldTranspileTo (T.unlines x) (T.unlines y)
