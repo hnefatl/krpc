@@ -109,11 +109,8 @@ instance Parseable TopLevelStatement where
 
 type Report = E.Report T.Text [T.Text]
 
-tokenise :: T.Text -> [T.Text]
-tokenise = T.words
-
-parseGrammar :: (Parseable a, MonadError Report m) => T.Text -> m a
-parseGrammar text = case E.fullParses (E.parser parse) (tokenise text) of
+parseGrammar :: (Parseable a, MonadError Report m) => [T.Text] -> m a
+parseGrammar tokens = case E.fullParses (E.parser parse) tokens of
   ([parsed], _) -> return parsed
   (_, report) -> throwError report
 

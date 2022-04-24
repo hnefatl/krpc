@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Schema.Grammar
+      Schema.Tokeniser
   other-modules:
       Paths_krpc
   hs-source-dirs:
@@ -44,6 +45,7 @@ test-suite krpc-test
   main-is: Spec.hs
   other-modules:
       Schema.GrammarSpec
+      Schema.TokeniserSpec
       Paths_krpc
   hs-source-dirs:
       test
