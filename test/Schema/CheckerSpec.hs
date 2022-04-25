@@ -30,3 +30,5 @@ spec = describe "Schema Checker" $ do
   shouldCheck "message Foo { string name = 1; int32 age = 2; }"
   shouldNotCheck "message Foo { string name = 1; int32 age = 1; }"
   shouldNotCheck "message Foo { string name = 1; int32 name = 2; }"
+  shouldCheck "message Foo { string name = 1; } message Bar { string name = 1; }"
+  shouldNotCheck "message Foo { string name = 1; } message Foo { string name = 1; }"
