@@ -26,6 +26,8 @@ source-repository head
 library
   exposed-modules:
       Backends.Python
+      Schema.Checker
+      Schema.CheckerState
       Schema.Grammar
       Schema.Tokeniser
   other-modules:
@@ -36,6 +38,9 @@ library
   build-depends:
       Earley ==0.13.0.1
     , base >=4.7 && <5
+    , containers ==0.6.4.1
+    , data-default ==0.7.1.1
+    , lens ==5.0.1
     , mtl ==2.2.2
     , text ==1.2.5.0
     , text-show ==3.9.6
@@ -46,6 +51,7 @@ test-suite krpc-test
   main-is: Spec.hs
   other-modules:
       Backends.PythonSpec
+      Schema.CheckerSpec
       Schema.GrammarSpec
       Schema.TokeniserSpec
       Paths_krpc
@@ -55,8 +61,11 @@ test-suite krpc-test
   build-depends:
       Earley ==0.13.0.1
     , base >=4.7 && <5
+    , containers ==0.6.4.1
+    , data-default ==0.7.1.1
     , hspec
     , krpc
+    , lens ==5.0.1
     , mtl ==2.2.2
     , text ==1.2.5.0
     , text-show ==3.9.6

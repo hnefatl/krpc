@@ -26,13 +26,31 @@ import TextShow
 -- }
 
 newtype FieldIdentifier = FieldIdentifier T.Text
-  deriving (Eq, Show)
+  deriving (Eq, Ord)
+
+instance Show FieldIdentifier where
+  show (FieldIdentifier t) = T.unpack t
+
+instance TextShow FieldIdentifier where
+  showb (FieldIdentifier t) = fromText t
 
 newtype TopLevelIdentifier = TopLevelIdentifier T.Text
-  deriving (Eq, Show)
+  deriving (Eq, Ord)
+
+instance Show TopLevelIdentifier where
+  show (TopLevelIdentifier t) = T.unpack t
+
+instance TextShow TopLevelIdentifier where
+  showb (TopLevelIdentifier t) = fromText t
 
 newtype FieldNum = FieldNum Word32
-  deriving (Eq, Show)
+  deriving (Eq, Ord)
+
+instance Show FieldNum where
+  show (FieldNum i) = show i
+
+instance TextShow FieldNum where
+  showb (FieldNum i) = fromString (show i)
 
 data TypeExpr
   = StringType
