@@ -49,7 +49,7 @@ fromTopLevelStatement (MessageStatement (TopLevelIdentifier name) fields) = do
     mapM_ fromFieldStatement fields
 
 fromFieldStatement :: LineWriter m => FieldStatement -> m ()
-fromFieldStatement (FieldStatement fieldType (FieldIdentifier name) fieldId) =
+fromFieldStatement (FieldStatement fieldType (FieldIdentifier name) _) =
   write $ name <> ": " <> fromFieldType fieldType
 
 fromFieldType :: TypeExpr -> T.Text
